@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<title>AirPen</title>
+<script type="text/javascript" src="//code.jquery.com/jquery-2.2.4.min.js"></script>
+<script type="text/javascript" src="./mqttws31.js"></script>
+<script type="text/javascript">
+var deviceid = null;
+var devicetype = "MyDevice";
+var eventtype = null;
+var test = null;
+var client;
+var pubTopic = 'iot-2/evt/status/fmt/json';
+var phoneData = {};
+phoneData.d = {};
+
+var isTouch = false;
+var touchData = [];
+var max_data = 10;  //. frequency of sending data. sending information with every this numbers of data.
+$(function(){
+  getDeviceId();
+
+  if( window.DeviceOrientationEvent ){
+    window.addEventListener( "deviceorientation", deviceOrientation );
+  }
+
+  if( window.TouchEvent ){
+    window.addEventListener( "touchstart", touchStart );
+    window.addEventListener( "touchend", touchEnd );
+  }
+
+  var clientID = "d:quickstart:" + devicetype + ":" + deviceid;
+  client = new Messaging.Client("quickstart.messaging.internetofthings.ibmcloud.com", 443, clientID );
+  client.onConnectionLost = onConnectionLost;
+  client.connect({onSuccess: onConnect, onFailure: onConnectFailure, useSSL: true});
+});
+
+function touchStart( e ){
+  var obj = e.changedTouches[0];
+  var touchY = obj.pageY;
+
+  //. 下半分をタッチした時のみ
+  if( touchY > ( window.innerHeight / 2 ) ){
+    isTouch = true;
+    touchData = [];
+  }
+}
+
+function touchEnd( e ){
+  isTouch = false;
+
+  if( touchData && touchData.length > 10 ){
+    //. 描画
+    var abg = null;
+    var x, y;
+
+    //. 最初のデータ
+    abg = touchData[0];
+    x = abg['lr'];
+    y = abg['fb'];
+
+    //. 最後のデータ
+    abg = touchData[touchData.length-1];
+    x = abg['lr'];
+    y = abg['fb'];
+
+    //. ２つ目以降のデータ
+    for( var i = 1; i < touchData.length; i ++ ){
+      //. ペンの移動を繰り返す
+      abg = touchData[i];
+      x = abg['lr'];
+      y = abg['fb'];
+    }
+
+    //. POST
+    /*
+    var formdata = new FormData();
+    formdata.append( 'image', blob );
+
+    $.ajax({
+      type: "POST",
+      url: "./image",
+      data: formdata,
+      contentType: false,
+      processData: false,
+      success: function( data, dataType ){
+        console.log( data );
+      },
+      error: function( jqXHR, textStatus, errorThrown ){
+        console.log( textStatus + ": " + errorThrown );
+      }
+    });
+    */
+
+    $('#abg_lr').html( '' );
+    $('#abg_fb').html( '' );
+    $('#abg_dir').html( '' );
+    touchData = [];
+  }
+}
+
+function deviceOrientation( e ){
+  if( isTouch ){
+    var gamma = e.gamma; //. Left/Right
+    var beta = e.beta;   //. Front/Back
+    var alpha = e.alpha; //. Direction
+
+    var abg = {};
+    abg['dir'] = alpha;
+    abg['fb'] = beta;
+    abg['lr'] = gamma;
+    $('#abg_lr').html( gamma );
+    $('#abg_fb').html( beta );
+    $('#abg_dir').html( alpha );
+
+    touchData.push( abg );
+    if( touchData.length >= max_data ){
+      //. 最初のデータ
+      abg = touchData[0];
+      x = abg['lr'];
+      y = abg['fb'];
+      z = abg['dir'];
+
+      publishMessage( x, y, z );
+      touchData = [];
+    }
+  }
+}
+
+function publishMessage( fb, lr, dir ){
+  if( deviceid != null ){
+    var d = {};
+    d['fb'] = fb;
+    d['lr'] = lr;
+    d['dir'] = dir;
+    d['timestamp'] = ( new Date() ).getTime();
+
+    phoneData.d = d;
+    phoneData.publish();
+  }
+}
+
+function onConnect() {
+  console.log("Connected");
+}
+function onConnectFailure(error) {
+  console.log("Connect Failed");
+  console.log(error.errorCode);
+  console.log(error.errorMessage);
+}
+function onConnectionLost(response) {
+  console.log("onConnectionLost")
+  if (response.errorCode !== 0) {
+    console.log("onConnectionLost:"+response.errorMessage);
+  }
+  clearInterval(msgInterval);
+  client.connect({onSuccess: onConnect, onFailure: onConnectFailure});
+}
+
+
+phoneData.toJson = function(){
+  return JSON.stringify( this );
+}
+
+phoneData.publish = function(){
+  var message = new Messaging.Message( phoneData.toJson() );
+  message.destinationName = pubTopic;
+  client.send( message );
+}
+
+
+function getDeviceId(){
+  var did = null;
+  cookies = document.cookie.split( "; " );
+  for( i = 0; i < cookies.length; i ++ ){
+    str = cookies[i].split( "=" );
+    if( unescape( str[0] ) == "deviceid" ){
+      did = unescape( unescape( str[1] ) );
+    }
+  }
+
+  if( did != null ){
+    deviceid = did;
+  }else{
+    deviceid = generateDeviceId();
+    //console.log( "deviceid = " + deviceid );
+  }
+  $('#deviceid').html( deviceid );
+  document.title = deviceid;
+}
+
+function generateDeviceId(){
+  var did = "";
+  var hx = "0123456789abcdef";
+  for( i = 0; i < 12; i ++ ){
+    var n = Math.floor( Math.random() * 16 );
+    if( n == 16 ){ n = 15; }
+    c = hx.charAt( n );
+    did += c;
+  }
+
+  var str = "deviceid=" + did;
+  document.cookie = str;
+
+  return did;
+}
+</script>
+<style type="text/css">
+html{
+  height: 100%;
+}
+
+body{
+  margin: 0;
+  height: 100%;
+}
+
+html, body{
+  text-align: center;
+  background-color: #ffffcc;
+  font-size: 20px;
+  color: #333;
+}
+
+table{
+  background-color: #ccffcc;
+}
+
+#cv{
+  border: 1px solid #333;
+}
+</style>
+</head>
+<body>
+<h3 id="deviceid">****************</h3>
+
+<table border="1" cellspacing="0" width="100%">
+ <thead>
+  <tr><th width="50%">Keys</th><th>Values</th></tr>
+ </thead>
+ <tbody>
+  <tr><td>LR</td><td id="abg_lr">&nbsp;</td></tr>
+  <tr><td>FB</td><td id="abg_fb">&nbsp;</td></tr>
+  <tr><td>DIR</td><td id="abg_dir">&nbsp;</td></tr>
+ </tbody>
+</table>
+
+<div id="result"></div>
+</body>
+</html>
