@@ -2,7 +2,7 @@
 
 ## Overview
 
-Send tilt information of your smartphone into IBM Watson IoT Service, and show them with node-red-dashboard.
+Send tilt information of your smartphone into IBM Watson IoT Service Quickstart, and show them with node-red-dashboard.
 
 ## Install & Settings
 
