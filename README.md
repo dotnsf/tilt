@@ -4,6 +4,7 @@
 
 Send tilt information of your smartphone into IBM Watson IoT Service Quickstart, and show them with node-red-dashboard.
 
+
 ## Install & Settings
 
 - Login to [IBM Cloud](http://bluemix.net/)
@@ -11,6 +12,10 @@ Send tilt information of your smartphone into IBM Watson IoT Service Quickstart,
 - Create application from **Node-RED starter** boilerplate.
 
 - Open Node-RED in IBM Cloud, and create flow with pasting flow.txt.
+
+    - Before create flow, you need following nodes installed in your Node-RED, if not yet:
+
+        - [node-red-dashboard - npm](https://www.npmjs.com/package/node-red-dashboard)
 
 <img src="https://github.com/dotnsf/tilt/blob/master/public/flow.png"/>
 
@@ -33,7 +38,6 @@ Send tilt information of your smartphone into IBM Watson IoT Service Quickstart,
     - ``$ node app``
 
 
-
 ## How to use
 
 - With your smartphone, browse running application.
@@ -53,6 +57,7 @@ Send tilt information of your smartphone into IBM Watson IoT Service Quickstart,
     - LR: Tilting information of Left and Right.
 
 - (WebGL)With your PC, browse dashboard: http://******.mybluemix.net/box
+
 
 ## Licensing
 
