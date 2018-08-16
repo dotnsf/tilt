@@ -52,7 +52,7 @@ Send tilt information of your smartphone into IBM Watson IoT Service Quickstart,
 
     - LR: Tilting information of Left and Right.
 
-- (WebGL)With your PC, browse dashboard: https://******.mybluemix.net/box
+- (WebGL)With your PC, browse dashboard: http://******.mybluemix.net/box
 
 ## Licensing
 
