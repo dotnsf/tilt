@@ -12,6 +12,8 @@ Send tilt information of your smartphone into IBM Watson IoT Service Quickstart,
 
 - Open Node-RED in IBM Cloud, and create flow with pasting flow.txt.
 
+<img src="https://github.com/dotnsf/tilt/blob/master/public/flow.png"/>
+
 - Deploy it once(not yet completed).
 
 - git-clone or download-and-unzip this codes.
@@ -22,11 +24,11 @@ Send tilt information of your smartphone into IBM Watson IoT Service Quickstart,
 
 - (Optional)You can customize frequency of sending data.
 
-    - Edit max_data value in public/index.html. You can decrease this number if you want to send more frequent data(but sending more amount of data). You can also increate this number if you want to send less frequent data(but sending less amount of data).
+    - Edit **exports.max_len** value in settings.js. You can decrease this number if you want to send more frequent data(but sending more amount of data). You can also increate this number if you want to send less frequent data(but sending less amount of data).
 
     - Default number is 10.
 
-- Run
+- Run with Node.js
 
     - ``$ node app``
 
@@ -36,13 +38,13 @@ Send tilt information of your smartphone into IBM Watson IoT Service Quickstart,
 
 - With your smartphone, browse running application.
 
-    - You will find your device id(12 digits) on top of your screen.
+    - You will find your device id(randomly generated 12 digits) on top of your screen.
 
-- Input that device id into IBM IoT node of Node-RED.
+- Input that device id value into IBM IoT node of Node-RED.
 
 - Deploy Node-RED flows.
 
-- With your PC, browse dashboard: https://******.mybluemix.net/ui/
+- (Dashboard)With your PC, browse dashboard: https://******.mybluemix.net/ui
 
     - DIR: DIRection of your phone.
 
@@ -50,6 +52,7 @@ Send tilt information of your smartphone into IBM Watson IoT Service Quickstart,
 
     - LR: Tilting information of Left and Right.
 
+- (WebGL)With your PC, browse dashboard: https://******.mybluemix.net/box
 
 ## Licensing
 

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/89/three.min.js"></script>
+<script>
+var socket;
+var wsUrl = 'wss://' + location.hostname + '/ws/tilt';
+
+// ページの読み込みを待つ
+window.addEventListener('load', init);
+
+function init() {
+  var geometry;
+  var material;
+  var box;
+
+  socket = new WebSocket( wsUrl );
+  socket.onmessage = function( e ){
+    var data = JSON.parse( e.data );
+    //console.log( data );
+    box.rotation.y = data.d.lr;
+    box.rotation.x = data.d.fb;
+    box.rotation.z = data.d.dir;
+  }
+
+  // サイズを指定
+  const width = 960;
+  const height = 540;
+
+  // レンダラーを作成
+  const renderer = new THREE.WebGLRenderer({
+    canvas: document.querySelector('#myCanvas')
+  });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(width, height);
+
+  // シーンを作成
+  const scene = new THREE.Scene();
+
+  // カメラを作成
+  const camera = new THREE.PerspectiveCamera(45, width / height);
+  camera.position.set(0, 0, +1000);
+
+  // 箱を作成
+  geometry = new THREE.BoxGeometry(400, 400, 400);
+  material = new THREE.MeshNormalMaterial();
+  box = new THREE.Mesh(geometry, material);
+  scene.add(box);
+
+  tick();
+
+  // 毎フレーム時に実行されるループイベントです
+  function tick() {
+    //box.rotation.y += 0.01;
+    renderer.render(scene, camera); // レンダリング
+
+    requestAnimationFrame(tick);
+  }
+}
+</script>
+</head>
+<body>
+<canvas id="myCanvas"></canvas>
+</body>
+</html>

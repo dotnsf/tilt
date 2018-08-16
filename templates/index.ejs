@@ -4,7 +4,7 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
-<title>AirPen</title>
+<title>Tilt</title>
 <script type="text/javascript" src="//code.jquery.com/jquery-2.2.4.min.js"></script>
 <script type="text/javascript" src="./mqttws31.js"></script>
 <script type="text/javascript">
@@ -19,7 +19,7 @@ phoneData.d = {};
 
 var isTouch = false;
 var touchData = [];
-var max_data = 10;  //. frequency of sending data. sending information with every this numbers of data.
+var max_data = <%= max_len %>;  //. frequency of sending data. sending information with every this numbers of data.
 $(function(){
   getDeviceId();
 
