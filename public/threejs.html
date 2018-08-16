@@ -19,8 +19,8 @@ function init() {
   socket.onmessage = function( e ){
     var data = JSON.parse( e.data );
     //console.log( data );
-    box.rotation.y = data.d.lr;
-    box.rotation.x = data.d.fb;
+    box.rotation.x = data.d.lr;
+    box.rotation.y = data.d.fb;
     box.rotation.z = data.d.dir;
   }
 
